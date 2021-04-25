@@ -12,7 +12,7 @@ import (
 	"github.com/lucas-clemente/quic-go"
 	"github.com/lucas-clemente/quic-go/integrationtests/tools/israce"
 	"github.com/lucas-clemente/quic-go/internal/protocol"
-	"github.com/lucas-clemente/quic-go/internal/qerr"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -221,7 +221,7 @@ var _ = Describe("Handshake tests", func() {
 						clientConfig,
 					)
 					Expect(err).To(HaveOccurred())
-					var transportErr *qerr.TransportError
+					var transportErr *quic.TransportError
 					Expect(errors.As(err, &transportErr)).To(BeTrue())
 					Expect(transportErr.ErrorCode.IsCryptoError()).To(BeTrue())
 					Expect(transportErr.Error()).To(ContainSubstring("x509: certificate is valid for localhost, not foo.bar"))
@@ -250,7 +250,7 @@ var _ = Describe("Handshake tests", func() {
 						Eventually(errChan).Should(Receive(&err))
 					}
 					Expect(err).To(HaveOccurred())
-					var transportErr *qerr.TransportError
+					var transportErr *quic.TransportError
 					Expect(errors.As(err, &transportErr)).To(BeTrue())
 					Expect(transportErr.ErrorCode.IsCryptoError()).To(BeTrue())
 					Expect(transportErr.Error()).To(ContainSubstring("tls: bad certificate"))
@@ -266,7 +266,7 @@ var _ = Describe("Handshake tests", func() {
 						clientConfig,
 					)
 					Expect(err).To(HaveOccurred())
-					var transportErr *qerr.TransportError
+					var transportErr *quic.TransportError
 					Expect(errors.As(err, &transportErr)).To(BeTrue())
 					Expect(transportErr.ErrorCode.IsCryptoError()).To(BeTrue())
 					Expect(transportErr.Error()).To(ContainSubstring("x509: certificate is valid for localhost, not foo.bar"))
@@ -328,9 +328,9 @@ var _ = Describe("Handshake tests", func() {
 
 			_, err := dial()
 			Expect(err).To(HaveOccurred())
-			var transportErr *qerr.TransportError
+			var transportErr *quic.TransportError
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
-			Expect(transportErr.ErrorCode).To(Equal(qerr.ConnectionRefused))
+			Expect(transportErr.ErrorCode).To(Equal(quic.ConnectionRefused))
 
 			// now accept one session, freeing one spot in the queue
 			_, err = server.Accept(context.Background())
@@ -344,7 +344,7 @@ var _ = Describe("Handshake tests", func() {
 			_, err = dial()
 			Expect(err).To(HaveOccurred())
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
-			Expect(transportErr.ErrorCode).To(Equal(qerr.ConnectionRefused))
+			Expect(transportErr.ErrorCode).To(Equal(quic.ConnectionRefused))
 		})
 
 		It("removes closed connections from the accept queue", func() {
@@ -360,9 +360,9 @@ var _ = Describe("Handshake tests", func() {
 
 			_, err = dial()
 			Expect(err).To(HaveOccurred())
-			var transportErr *qerr.TransportError
+			var transportErr *quic.TransportError
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
-			Expect(transportErr.ErrorCode).To(Equal(qerr.ConnectionRefused))
+			Expect(transportErr.ErrorCode).To(Equal(quic.ConnectionRefused))
 
 			// Now close the one of the session that are waiting to be accepted.
 			// This should free one spot in the queue.
@@ -378,7 +378,7 @@ var _ = Describe("Handshake tests", func() {
 			_, err = dial()
 			Expect(err).To(HaveOccurred())
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
-			Expect(transportErr.ErrorCode).To(Equal(qerr.ConnectionRefused))
+			Expect(transportErr.ErrorCode).To(Equal(quic.ConnectionRefused))
 		})
 	})
 
@@ -421,7 +421,7 @@ var _ = Describe("Handshake tests", func() {
 				nil,
 			)
 			Expect(err).To(HaveOccurred())
-			var transportErr *qerr.TransportError
+			var transportErr *quic.TransportError
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
 			Expect(transportErr.ErrorCode.IsCryptoError()).To(BeTrue())
 			Expect(transportErr.Error()).To(ContainSubstring("no application protocol"))
@@ -502,9 +502,9 @@ var _ = Describe("Handshake tests", func() {
 				nil,
 			)
 			Expect(err).To(HaveOccurred())
-			var transportErr *qerr.TransportError
+			var transportErr *quic.TransportError
 			Expect(errors.As(err, &transportErr)).To(BeTrue())
-			Expect(transportErr.ErrorCode).To(Equal(qerr.InvalidToken))
+			Expect(transportErr.ErrorCode).To(Equal(quic.InvalidToken))
 			// Receiving a Retry might lead the client to measure a very small RTT.
 			// Then, it sometimes would retransmit the ClientHello before receiving the ServerHello.
 			Expect(len(tokenChan)).To(BeNumerically(">=", 2))
