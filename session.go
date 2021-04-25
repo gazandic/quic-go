@@ -1271,7 +1271,7 @@ func (s *session) handleConnectionCloseFrame(frame *wire.ConnectionCloseFrame) {
 	if frame.IsApplicationError {
 		s.closeRemote(&qerr.ApplicationError{
 			Remote:       true,
-			ErrorCode:    frame.ErrorCode,
+			ErrorCode:    qerr.ApplicationErrorCode(frame.ErrorCode),
 			ErrorMessage: frame.ReasonPhrase,
 		})
 		return
@@ -1460,7 +1460,7 @@ func (s *session) shutdown() {
 
 func (s *session) CloseWithError(code ErrorCode, desc string) error {
 	s.closeLocal(&qerr.ApplicationError{
-		ErrorCode:    uint64(code),
+		ErrorCode:    code,
 		ErrorMessage: desc,
 	})
 	<-s.ctx.Done()
